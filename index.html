@@ -9,17 +9,20 @@
         :root { --brand: #4f46e5; --bg: #f8fafc; --text: #0f172a; --sub: #64748b; --border: #e2e8f0; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; }
         .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 2px solid var(--border); padding-bottom: 15px; }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 15px; }
         .logo { font-size: 24px; font-weight: 800; color: var(--text); letter-spacing: -1px; }
         .logo span { color: var(--brand); }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 40px; }
-        .stat-card { background: #fff; padding: 24px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .stat-card small { color: var(--sub); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
-        .stat-card h2 { margin: 10px 0 0; font-size: 32px; font-weight: 800; }
+        .report-month { text-align: center; margin-bottom: 30px; }
+        .report-month h2 { margin: 0; font-weight: 700; }
 
-        .upload-section { background: white; border: 2px dashed var(--border); border-radius: 20px; padding: 50px; text-align: center; margin-bottom: 40px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-bottom: 40px; }
+        .stat-card { background: #fff; padding: 24px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); text-align: center; }
+        .stat-card small { color: var(--sub); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+        .stat-card h2 { margin: 10px 0 0; font-size: 28px; font-weight: 800; }
+
+        .upload-section { background: white; border: 2px dashed var(--border); border-radius: 20px; padding: 40px; text-align: center; margin-bottom: 40px; }
         .upload-section:hover { border-color: var(--brand); background: #f1f5f9; transition: 0.2s; }
 
         .btn { padding: 12px 28px; border-radius: 10px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; transition: 0.2s; border: none; font-size: 14px; }
@@ -27,7 +30,7 @@
         .btn-outline { background: white; border: 1px solid var(--border); color: var(--text); margin-right: 10px; }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
-        .data-card { background: white; border-radius: 20px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 10px 15px rgba(0,0,0,0.05); }
+        .data-card { background: white; border-radius: 20px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 10px 15px rgba(0,0,0,0.05); margin-bottom: 40px; }
         table { width: 100%; border-collapse: collapse; }
         th { background: #f8fafc; text-align: left; padding: 18px; font-size: 12px; text-transform: uppercase; color: var(--sub); border-bottom: 1px solid var(--border); }
         td { padding: 18px; border-bottom: 1px solid #f8fafc; font-size: 14px; }
@@ -36,7 +39,13 @@
 
         .graph-card { background: white; padding: 40px; border-radius: 20px; border: 1px solid var(--border); margin-top: 40px; text-align: center; }
         .graph-card img { max-width: 100%; border-radius: 12px; }
-        .actions-row { display: flex; justify-content: flex-end; margin-bottom: 15px; }
+
+        .actions-row { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; margin-bottom: 15px; }
+
+        .legend-blocks { display: flex; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+        .legend-block { display: flex; align-items: center; margin: 8px 15px; font-size: 13px; }
+        .legend-color { width: 16px; height: 16px; margin-right: 6px; border-radius: 4px; }
+        input[name="report_month"] { padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); width: 200px; margin-bottom: 20px; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -49,12 +58,20 @@
     <div class="upload-section">
         <form method="POST" enctype="multipart/form-data">
             <h3 style="margin: 0 0 10px;">Biometric Data Upload</h3>
-            <p style="color: var(--sub); margin-bottom: 25px;">Select Excel files to calculate outside durations.</p>
-            <input type="file" name="files" multiple accept=".xlsx" style="margin-bottom: 20px;">
+            <p style="color: var(--sub); margin-bottom: 15px;">Enter the month for this report:</p>
+            <input type="text" name="report_month" placeholder="e.g., January 2026" value="{{ month or '' }}">
+            <p style="color: var(--sub); margin: 15px 0 25px;">Select Excel files to calculate outside durations.</p>
+            <input type="file" name="files" multiple accept=".xlsx">
             <br>
             <button type="submit" class="btn btn-brand">Generate Analytics Report</button>
         </form>
     </div>
+
+    {% if month %}
+    <div class="report-month">
+        <h2>Attendance Report – {{ month }}</h2>
+    </div>
+    {% endif %}
 
     {% if results %}
     <div class="stats-grid">
@@ -63,18 +80,19 @@
             <h2>{{ stats.total }}</h2>
         </div>
         <div class="stat-card">
-            <small>Avg Time Outside</small>
-            <h2 style="color: var(--brand);">{{ stats.avg }} <span style="font-size: 16px; font-weight:400; color:var(--sub)">hrs</span></h2>
+            <small>Average Hours Outside</small>
+            <h2 style="color: var(--brand);">{{ stats.avg }} <span style="font-size:16px; color:var(--sub)">hrs</span></h2>
         </div>
         <div class="stat-card">
             <small>Peak Outsider</small>
-            <h2 style="font-size: 22px; color: #f43f5e;">{{ stats.max_name }}</h2>
+            <h2 style="color:#f43f5e;">{{ stats.max_name }}</h2>
         </div>
     </div>
 
     <div class="actions-row">
         <a href="/download/csv" class="btn btn-outline">📥 Download Summary CSV</a>
         <a href="/download/graph" class="btn btn-outline">🖼️ Export Analytics Chart</a>
+        <a href="/download/daily" class="btn btn-outline">📊 Download Daily Report</a>
     </div>
 
     <div class="data-card">
@@ -83,6 +101,7 @@
                 <tr>
                     <th>Emp ID</th>
                     <th>Full Name</th>
+                    <th>Designation</th>
                     <th>Working Days</th>
                     <th>Outside (Minutes)</th>
                     <th>Outside (Hours)</th>
@@ -93,6 +112,7 @@
                 <tr>
                     <td><span class="badge">ID: {{ row.ID }}</span></td>
                     <td><strong>{{ row.Name }}</strong></td>
+                    <td>{{ row.Designation }}</td>
                     <td>{{ row.Days }} Days</td>
                     <td style="color: var(--sub);">{{ row.Mins }}</td>
                     <td style="font-weight: 700; color: var(--brand);">{{ row.Hrs }}</td>
@@ -103,9 +123,19 @@
     </div>
 
     <div class="graph-card">
-        <h3>Time Spent Outside: Ranked View</h3>
-        <p style="color: var(--sub); font-size: 13px; margin-bottom: 20px;">Chart automatically scales width based on number of employees.</p>
+        <h3>Time Spent Outside (Hours) – {{ month }}</h3>
         <img src="/download/graph" alt="Analysis Chart">
+
+        <div class="legend-blocks">
+            {% for desig, color in colors_map.items() %}
+                {% if desig in results|map(attribute='Designation') %}
+                <div class="legend-block">
+                    <div class="legend-color" style="background-color: {{ color }}"></div>
+                    {{ desig }}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
     </div>
     {% endif %}
 </div>
