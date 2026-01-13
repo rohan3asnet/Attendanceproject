@@ -303,7 +303,9 @@ def download(f):
     return send_file(os.path.join(OUTPUT_DIR, t), as_attachment=True)
 
 # -----------------------------
+# -----------------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    Timer(1, lambda: webbrowser.open(f"http://127.0.0.1:{port}")).start()
+    # Just run Flask normally, no automatic browser open
     app.run(host="127.0.0.1", port=port, debug=True)
+
