@@ -5,4 +5,5 @@ This project is the outcome of colaborative efforts form four team members:
 2. Rohan Basnet
 3. Sandeep Bhusal
 4. Shrijhana Bhattarai
-This prject was done during the intern at Load Dispatch Centre(LDC).
+   
+This project was done during the intern at Load Dispatch Centre(LDC).
